@@ -1,0 +1,23 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.HealthHub" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorSecondary">@color/colorSecundary</item>
+
+
+    </style>
+
+    <style name="Theme.HealthHub" parent="Base.Theme.HealthHub" />
+
+    <style name="ButtonWithGradientBackground"></style>
+
+    <style name="Theme.HealthHub.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.HealthHub.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.HealthHub.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
