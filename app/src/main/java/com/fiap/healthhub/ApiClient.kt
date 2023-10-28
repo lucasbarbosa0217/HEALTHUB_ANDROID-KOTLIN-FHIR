@@ -36,103 +36,16 @@ class ApiClient(private val context: Context) {
     }
 
     fun createPatient(patient: JSONObject, callback: (JSONObject?) -> Unit) {
-        // Você pode construir o objeto JSON de acordo com a estrutura do código React
-        val patientObject = JSONObject()
-        patientObject.put("resourceType", "Patient")
 
-        val meta = JSONObject()
-        val profile = JSONArray()
-        profile.put("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
-        meta.put("profile", profile)
-
-        val identifiers = JSONArray()
-        val identifier = JSONObject()
-        identifier.put("system", "cpf")
-        identifier.put("value", patient.optString("value"))
-        Log.w("reposta", "createPatient: "+ patient.optString("value"), )
-        identifiers.put(identifier)
-
-        val names = JSONArray()
-        val name = JSONObject()
-        name.put("use", "official")
-        name.put("text", "${patient.optString("firstName", "")} ${patient.optString("lastName", "")}")
-        name.put("family", patient.optString("family", ""))
-        val given = JSONArray()
-        given.put(patient.optString("firstName", ""))
-        name.put("given", given)
-        names.put(name)
-
-        val telecom = JSONArray()
-        val contactNumber = JSONObject()
-        contactNumber.put("system", "phone")
-        contactNumber.put("value", patient.optString("value", ""))
-        contactNumber.put("use", "mobile")
-        telecom.put(contactNumber)
-
-        patientObject.put("meta", meta)
-        patientObject.put("identifier", identifiers)
-        patientObject.put("name", names)
-        patientObject.put("telecom", telecom)
-        patientObject.put("gender", patient.optString("gender", ""))
-        patientObject.put("birthDate", patient.optString("birthDate", ""))
-
-        // Agora você pode usar o objeto `patientObject` no seu pedido
-        val tipoDoObjeto = patientObject.javaClass
-        Log.w("RESPOSTA", "createPatient: "+tipoDoObjeto+"\n"+patientObject, )
-        makeApiCall("Patient", "POST", patientObject, callback)
+        makeApiCall("Patient", "POST", patient, callback)
     }
 
     fun getPatientByCpf(cpf: String, callback: (JSONObject?) -> Unit) {
         makeApiCall("Patient?identifier=cpf|$cpf", "GET", null, callback)
     }
     fun createMedicalRegistration(data: JSONObject, callback: (JSONObject?) -> Unit) {
-        val medicalRecordObject = JSONObject()
-        medicalRecordObject.put("resourceType", "Bundle")
-        medicalRecordObject.put("type", "document")
 
-        val identifierObject = JSONObject()
-        identifierObject.put("system", "cpf")
-        identifierObject.put("value", data.optString("cpfPaciente", "X")) // Preencha com 'X' se estiver vazio
-
-        medicalRecordObject.put("identifier", identifierObject)
-
-        val entryArray = JSONArray()
-
-        val conditionObject = JSONObject()
-        conditionObject.put("resourceType", "Condition")
-
-        val clinicalStatusObject = JSONObject()
-        clinicalStatusObject.put("coding", JSONArray().put(JSONObject().apply {
-            put("system", "http://hl7.org/fhir/ValueSet/condition-clinical")
-            put("code", data.optString("status", "X")) // Preencha com 'X' se estiver vazio
-        }))
-        conditionObject.put("clinicalStatus", clinicalStatusObject)
-
-        val verificationStatusObject = JSONObject()
-        verificationStatusObject.put("coding", JSONArray().put(JSONObject().apply {
-            put("system", "http://hl7.org/fhir/ValueSet/condition-ver-status")
-            put("code", data.optString("statusVerificacao", "X")) // Preencha com 'X' se estiver vazio
-        }))
-        conditionObject.put("verificationStatus", verificationStatusObject)
-
-        conditionObject.put("recordedDate", data.optString("dataRegistro", "X")) // Preencha com 'X' se estiver vazio
-        conditionObject.put("abatementDateTime", data.optString("dataAbatimento", "X")) // Preencha com 'X' se estiver vazio
-
-        val noteArray = JSONArray()
-        noteArray.put(JSONObject().apply {
-            put("text", data.optString("problema", "X")) // Preencha com 'X' se estiver vazio
-        })
-        conditionObject.put("note", noteArray)
-
-        val conditionEntry = JSONObject()
-        conditionEntry.put("resource", conditionObject)
-        entryArray.put(conditionEntry)
-
-        medicalRecordObject.put("entry", entryArray)
-
-        val tipoDoObjeto = medicalRecordObject.javaClass
-        Log.w("RESPOSTA", "createPatient: "+tipoDoObjeto+"\n"+medicalRecordObject, )
-        makeApiCall("Bundle", "POST", medicalRecordObject, callback)
+        makeApiCall("Bundle", "POST", data, callback)
     }
 
 

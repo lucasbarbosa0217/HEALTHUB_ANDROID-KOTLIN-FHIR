@@ -43,37 +43,19 @@ class CadastrarPaciente : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, genderOptions)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         genderSpinner.adapter = adapter
-        Log.d("Debug", "First Name: ${firstNameEditText.text.toString()}")
-        Log.d("Debug", "Last Name: ${lastNameEditText.text.toString()}")
 
 
         fun createPatientObject(): JSONObject {
             val patient = JSONObject()
-            val firstName = firstNameEditText.text.toString()
-            val lastName = lastNameEditText.text.toString()
-            val cpf = cpfEditText.text.toString()
-            // Resource Type
+
             patient.put("resourceType", "Patient")
 
-            // Meta
             val meta = JSONObject()
             val profile = JSONArray()
             profile.put("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
             meta.put("profile", profile)
             patient.put("meta", meta)
 
-
-            val nameObject = JSONObject()
-            nameObject.put("use", "official")
-            nameObject.put("text", "$firstName $lastName")
-            val givenArray = JSONArray()
-            givenArray.put(firstName)
-            nameObject.put("given", givenArray)
-
-            val identifierObject = JSONObject()
-            identifierObject.put("system", "cpf")
-            identifierObject.put("value", cpf)
-            // Identifier
             val identifiers = JSONArray()
             val identifier = JSONObject()
             identifier.put("system", "cpf")
@@ -81,21 +63,17 @@ class CadastrarPaciente : AppCompatActivity() {
             identifiers.put(identifier)
             patient.put("identifier", identifiers)
 
-            // Name
             val names = JSONArray()
             val name = JSONObject()
             name.put("use", "official")
-            name.put("text", "${firstNameEditText.text.toString()} ${lastNameEditText.text.toString()}")
-            val nameFamily = JSONArray()
-            nameFamily.put(lastNameEditText.text.toString())
-            val nameGiven = JSONArray()
-            nameGiven.put(firstNameEditText.text.toString())
-            name.put("family", nameFamily)
-            name.put("given", nameGiven)
+            name.put("text", "${firstNameEditText.text} ${lastNameEditText.text}")
+            name.put("family", lastNameEditText.text.toString())
+            val givenArray = JSONArray()
+            givenArray.put(firstNameEditText.text.toString())
+            name.put("given", givenArray)
             names.put(name)
             patient.put("name", names)
 
-            // Telecom
             val telecom = JSONArray()
             val contactNumber = JSONObject()
             contactNumber.put("system", "phone")
@@ -104,10 +82,8 @@ class CadastrarPaciente : AppCompatActivity() {
             telecom.put(contactNumber)
             patient.put("telecom", telecom)
 
-            // Gender
             patient.put("gender", genderOptions[genderSpinner.selectedItemPosition])
 
-            // BirthDate
             val birthDateStr = birthDateEditText.text.toString()
             val sdfInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val sdfOutput = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -120,7 +96,6 @@ class CadastrarPaciente : AppCompatActivity() {
 
 
 
-
         genderSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>?,
@@ -128,27 +103,27 @@ class CadastrarPaciente : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                // A opção selecionada está em genderOptions[position]
                 val selectedGender = genderOptions[position]
-                // Faça o que for necessário com a opção selecionada
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>?) {
-                // Caso nenhum item seja selecionado
             }
         }
 
         submitButton.setOnClickListener {
             try {
-                Log.d("Debug", "First Name: ${firstNameEditText.text.toString()}")
-                Log.d("Debug", "Last Name: ${lastNameEditText.text.toString()}")
-
 
                 val patientJson = createPatientObject()
 
                 ApiClient(this).createPatient(patientJson) { response ->
                     if (response != null) {
                         Log.w("RESPOSTA", "Sucesso: $response")
+                        Toast.makeText(
+                            this,
+                            "Paciente Criado",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish();
                     } else {
                         Log.e("RESPOSTA", "Erro: Resposta nula")
                         Toast.makeText(
@@ -187,7 +162,6 @@ class CadastrarPaciente : AppCompatActivity() {
         }
 
         datePicker.addOnPositiveButtonClickListener { selectedDate ->
-            // Manipule a data selecionada aqui (por exemplo, atualize o campo de texto)
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = selectedDate
             val selectedDateString = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
